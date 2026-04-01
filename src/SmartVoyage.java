@@ -11,6 +11,7 @@ class Route{
     String destination;
     double travelCost;
     double distance;
+
     Route(String s,String d,double t,double km){
         source=s;
         destination=d;
@@ -23,6 +24,7 @@ class Destination{
     String city;
     double hotelPerDay;
     double foodPerDay;
+
     Destination(String c,double h,double f){
         city=c;
         hotelPerDay=h;
@@ -33,10 +35,12 @@ class Destination{
 class BookingThread extends Thread{
     String name;
     String destination;
+
     BookingThread(String n,String d){
         name=n;
         destination=d;
     }
+
     public void run(){
         System.out.println("Processing booking for "+name);
         try{Thread.sleep(1000);}catch(Exception e){}
@@ -53,10 +57,12 @@ class NotificationThread extends Thread{
 class Admin{
     String name;
     String password="1234";
+
     List<String> sources=new ArrayList<>();
     List<Destination> destinations=new ArrayList<>();
     List<Route> routes=new ArrayList<>();
     Map<String,Integer> bookingCount=new HashMap<>();
+
     int totalTrips=0;
 
     Admin(String n){
@@ -64,7 +70,7 @@ class Admin{
     }
 
     boolean login(String n,String p){
-        return name.equals(n)&&password.equals(p);
+        return name.equals(n) && password.equals(p);
     }
 
     void addSource(String s){
@@ -76,13 +82,14 @@ class Admin{
         bookingCount.put(c,0);
     }
 
-    void addRoute(String s,String d,double t,double km){
-        routes.add(new Route(s,d,t,km));
+    void addRoute(String s,String d,double km){
+        double cost=km*4;
+        routes.add(new Route(s,d,cost,km));
     }
 
     Route getRoute(String s,String d){
         for(Route r:routes){
-            if(r.source.equalsIgnoreCase(s)&&r.destination.equalsIgnoreCase(d)){
+            if(r.source.equalsIgnoreCase(s) && r.destination.equalsIgnoreCase(d)){
                 return r;
             }
         }
@@ -99,16 +106,12 @@ class Admin{
     }
 
     void dashboard(){
-        System.out.println("\n========== ADMIN DASHBOARD ==========");
-        System.out.println("Admin: "+name);
+        System.out.println("\n===== ADMIN DASHBOARD =====");
         System.out.println("Total Trips: "+totalTrips);
-        System.out.println("Sources: "+sources.size());
-        System.out.println("Destinations: "+destinations.size());
-        System.out.println("\nBooking Status");
+
         for(String d:bookingCount.keySet()){
             System.out.println(d+" : "+bookingCount.get(d)+"/4 booked");
         }
-        System.out.println("=====================================");
     }
 
     void viewSources(){
@@ -120,7 +123,9 @@ class Admin{
     void viewDestinations(){
         for(int i=0;i<destinations.size();i++){
             Destination d=destinations.get(i);
-            System.out.println((i+1)+". "+d.city+" Hotel:"+d.hotelPerDay+" Food:"+d.foodPerDay);
+            System.out.println((i+1)+". "+d.city+
+                    " Hotel:"+d.hotelPerDay+
+                    " Food:"+d.foodPerDay);
         }
     }
 
@@ -131,21 +136,44 @@ class Admin{
     }
 
     void generateRoutes(){
-        Random r=new Random();
-        routes.clear();
-        for(String s:sources){
-            for(Destination d:destinations){
-                double km=100+r.nextInt(600);
-                double cost=km*5;
-                routes.add(new Route(s,d.city,cost,km));
-            }
-        }
+
+        addRoute("Dehradun","Rishikesh",45);
+        addRoute("Dehradun","Shimla",230);
+        addRoute("Dehradun","Agra",380);
+        addRoute("Dehradun","Manali",480);
+        addRoute("Dehradun","Goa",1900);
+
+        addRoute("Delhi","Rishikesh",240);
+        addRoute("Delhi","Shimla",340);
+        addRoute("Delhi","Agra",230);
+        addRoute("Delhi","Manali",540);
+        addRoute("Delhi","Goa",1900);
+
+        addRoute("Chandigarh","Shimla",120);
+        addRoute("Chandigarh","Manali",300);
+        addRoute("Chandigarh","Rishikesh",210);
+        addRoute("Chandigarh","Agra",450);
+        addRoute("Chandigarh","Goa",1800);
+
+        addRoute("Mumbai","Goa",590);
+        addRoute("Mumbai","Agra",1200);
+        addRoute("Mumbai","Rishikesh",1700);
+        addRoute("Mumbai","Shimla",1800);
+        addRoute("Mumbai","Manali",1900);
+
+        addRoute("Jaipur","Agra",240);
+        addRoute("Jaipur","Rishikesh",420);
+        addRoute("Jaipur","Shimla",520);
+        addRoute("Jaipur","Manali",720);
+        addRoute("Jaipur","Goa",1600);
     }
 }
 
-public class SmartVoyage{
+    public class SmartVoyage{
     public static void main(String[] args){
+
         Scanner sc=new Scanner(System.in);
+
         Admin admin=new Admin("admin");
 
         admin.addSource("Delhi");
@@ -163,146 +191,150 @@ public class SmartVoyage{
         admin.generateRoutes();
 
         while(true){
+
             System.out.println("\n1 Admin Panel");
             System.out.println("2 Customer Panel");
             System.out.println("3 Exit");
+
             int choice=sc.nextInt();
 
             switch(choice){
 
-                case 1 -> {
+                case 1:{
+
                     sc.nextLine();
+
                     System.out.print("Enter Admin Name: ");
                     String n=sc.nextLine();
+
                     System.out.print("Enter Password: ");
                     String p=sc.nextLine();
 
                     if(admin.login(n,p)){
+
                         while(true){
+
                             System.out.println("\n1 Dashboard");
                             System.out.println("2 View Sources");
                             System.out.println("3 View Destinations");
-                            System.out.println("4 Add Source");
-                            System.out.println("5 Add Destination");
-                            System.out.println("6 Regenerate Routes");
-                            System.out.println("7 View Bookings");
-                            System.out.println("8 Exit");
+                            System.out.println("4 View Bookings");
+                            System.out.println("5 Exit");
                             int a=sc.nextInt();
-
                             switch(a){
-                                case 1 -> admin.dashboard();
-                                case 2 -> admin.viewSources();
-                                case 3 -> admin.viewDestinations();
-                                case 4 -> {
-                                    sc.nextLine();
-                                    System.out.print("Enter Source: ");
-                                    admin.addSource(sc.nextLine());
-                                    admin.generateRoutes();
-                                }
-                                case 5 -> {
-                                    sc.nextLine();
-                                    System.out.print("City: ");
-                                    String c=sc.nextLine();
-                                    System.out.print("Hotel: ");
-                                    double h=sc.nextDouble();
-                                    System.out.print("Food: ");
-                                    double f=sc.nextDouble();
-                                    admin.addDestination(c,h,f);
-                                    admin.generateRoutes();
-                                }
-                                case 6 -> admin.generateRoutes();
-                                case 7 -> admin.viewBookings();
-                                case 8 -> { break; }
+
+                                case 1: admin.dashboard(); break;
+                                case 2: admin.viewSources(); break;
+                                case 3: admin.viewDestinations(); break;
+                                case 4: admin.viewBookings(); break;
+                                case 5: break;
                             }
-                            if(a==8) break;
+
+                            if(a==5) break;
                         }
+
                     }else{
                         System.out.println("Invalid Login");
                     }
+
+                    break;
                 }
 
-                case 2 -> {
+                case 2:{
+
                     try{
+
                         sc.nextLine();
+
                         System.out.print("Enter Name: ");
                         String name=sc.nextLine();
 
                         System.out.print("Enter Budget: ");
                         double budget=sc.nextDouble();
-                        if(budget<=0) throw new InvalidBudgetException("Invalid Budget");
+
+                        if(budget<=0)
+                            throw new InvalidBudgetException("Invalid Budget");
 
                         System.out.print("Enter Days: ");
                         int days=sc.nextInt();
 
                         System.out.println("\nSelect Source:");
                         admin.viewSources();
+
                         String source=admin.sources.get(sc.nextInt()-1);
 
                         System.out.println("\nSelect Destination:");
+
                         for(int i=0;i<admin.destinations.size();i++){
                             System.out.println((i+1)+". "+admin.destinations.get(i).city);
                         }
+
                         String dest=admin.destinations.get(sc.nextInt()-1).city;
 
                         Route route=admin.getRoute(source,dest);
+
+                        if(route==null){
+                            System.out.println("Route not available");
+                            break;
+                        }
+
                         Destination d=admin.getDestination(dest);
 
                         double travel=route.travelCost;
                         double hotel=d.hotelPerDay*days;
                         double food=d.foodPerDay*days;
+
                         double total=travel+hotel+food;
 
                         if(admin.bookingCount.get(dest)>=4){
-                            System.out.println("Hotel already booked for "+dest);
+                            System.out.println("Hotel already booked");
                             break;
                         }
 
                         if(budget>=total){
+
                             System.out.println("\nTrip Possible");
                             System.out.println("Customer: "+name);
                             System.out.println("Source: "+source);
                             System.out.println("Destination: "+dest);
                             System.out.println("Distance: "+route.distance+" km");
-                            System.out.println("Travel: "+travel);
-                            System.out.println("Hotel: "+hotel);
-                            System.out.println("Food: "+food);
-                            System.out.println("Total: "+total);
-                            System.out.println("Remaining: "+(budget-total));
+                            System.out.println("Total Cost: "+total);
 
-                            System.out.println("\n1 Confirm Trip");
+                            System.out.println("\n1 Confirm");
                             System.out.println("2 Cancel");
+
                             int c=sc.nextInt();
 
                             if(c==1){
-                                admin.bookingCount.put(dest,admin.bookingCount.get(dest)+1);
+
+                                admin.bookingCount.put(dest,
+                                        admin.bookingCount.get(dest)+1);
+
                                 admin.totalTrips++;
 
-                                BookingThread bt=new BookingThread(name,dest);
-                                NotificationThread nt=new NotificationThread();
-                                bt.start();
-                                nt.start();
+                                new BookingThread(name,dest).start();
+                                new NotificationThread().start();
                             }
 
                         }else{
+
                             System.out.println("\nTrip not possible");
-                            System.out.println("\nAvailable Trips in Your Budget\n");
 
                             boolean found=false;
 
                             for(Destination des:admin.destinations){
+
                                 Route r=admin.getRoute(source,des.city);
-                                double t=r.travelCost;
-                                double h=des.hotelPerDay*days;
-                                double f=des.foodPerDay*days;
-                                double tot=t+h+f;
+
+                                if(r==null) continue;
+
+                                double tot=r.travelCost +
+                                        des.hotelPerDay*days +
+                                        des.foodPerDay*days;
 
                                 if(budget>=tot && admin.bookingCount.get(des.city)<4){
                                     found=true;
                                     System.out.println(source+" -> "+des.city);
                                     System.out.println("Distance: "+r.distance+" km");
-                                    System.out.println("Travel: "+t);
-                                    System.out.println("Hotel: "+h);
-                                    System.out.println("Food: "+f);
                                     System.out.println("Total: "+tot);
                                     System.out.println();
                                 }
@@ -316,9 +348,11 @@ public class SmartVoyage{
                     }catch(InvalidBudgetException e){
                         System.out.println(e.getMessage());
                     }
+
+                    break;
                 }
 
-                case 3 -> {
+                case 3:{
                     System.out.println("Exiting...");
                     System.exit(0);
                 }
