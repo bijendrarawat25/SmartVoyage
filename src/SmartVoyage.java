@@ -32,6 +32,22 @@ class Destination{
     }
 }
 
+class Booking{
+    String customerName;
+    String source;
+    String destination;
+    double distance;
+    double totalCost;
+
+    Booking(String n,String s,String d,double km,double cost){
+        customerName=n;
+        source=s;
+        destination=d;
+        distance=km;
+        totalCost=cost;
+    }
+}
+
 class BookingThread extends Thread{
     String name;
     String destination;
@@ -55,6 +71,7 @@ class NotificationThread extends Thread{
 }
 
 class Admin{
+
     String name;
     String password="1234";
 
@@ -62,6 +79,7 @@ class Admin{
     List<Destination> destinations=new ArrayList<>();
     List<Route> routes=new ArrayList<>();
     Map<String,Integer> bookingCount=new HashMap<>();
+    List<Booking> bookings=new ArrayList<>();
 
     int totalTrips=0;
 
@@ -89,7 +107,8 @@ class Admin{
 
     Route getRoute(String s,String d){
         for(Route r:routes){
-            if(r.source.equalsIgnoreCase(s) && r.destination.equalsIgnoreCase(d)){
+            if(r.source.equalsIgnoreCase(s) &&
+               r.destination.equalsIgnoreCase(d)){
                 return r;
             }
         }
@@ -106,6 +125,7 @@ class Admin{
     }
 
     void dashboard(){
+
         System.out.println("\n===== ADMIN DASHBOARD =====");
         System.out.println("Total Trips: "+totalTrips);
 
@@ -130,8 +150,22 @@ class Admin{
     }
 
     void viewBookings(){
-        for(String d:bookingCount.keySet()){
-            System.out.println(d+" : "+bookingCount.get(d)+"/4 booked");
+
+        System.out.println("\n===== CUSTOMER TRIPS =====");
+
+        if(bookings.size()==0){
+            System.out.println("No trips booked yet");
+            return;
+        }
+
+        for(Booking b:bookings){
+
+            System.out.println("Customer: "+b.customerName);
+            System.out.println("Source: "+b.source);
+            System.out.println("Destination: "+b.destination);
+            System.out.println("Distance: "+b.distance+" km");
+            System.out.println("Total Cost: "+b.totalCost);
+            System.out.println("---------------------------");
         }
     }
 
@@ -169,7 +203,8 @@ class Admin{
     }
 }
 
-    public class SmartVoyage{
+public class SmartVoyage{
+
     public static void main(String[] args){
 
         Scanner sc=new Scanner(System.in);
@@ -200,7 +235,7 @@ class Admin{
 
             switch(choice){
 
-                case 1:{
+                case 1:
 
                     sc.nextLine();
 
@@ -219,9 +254,10 @@ class Admin{
                             System.out.println("3 View Destinations");
                             System.out.println("4 View Bookings");
                             System.out.println("5 Exit");
-                            int a=sc.nextInt();
-                            switch(a){
 
+                            int a=sc.nextInt();
+
+                            switch(a){
                                 case 1: admin.dashboard(); break;
                                 case 2: admin.viewSources(); break;
                                 case 3: admin.viewDestinations(); break;
@@ -237,9 +273,8 @@ class Admin{
                     }
 
                     break;
-                }
 
-                case 2:{
+                case 2:
 
                     try{
 
@@ -259,13 +294,12 @@ class Admin{
 
                         System.out.println("\nSelect Source:");
                         admin.viewSources();
-
                         String source=admin.sources.get(sc.nextInt()-1);
 
                         System.out.println("\nSelect Destination:");
-
                         for(int i=0;i<admin.destinations.size();i++){
-                            System.out.println((i+1)+". "+admin.destinations.get(i).city);
+                            System.out.println((i+1)+". "+
+                                    admin.destinations.get(i).city);
                         }
 
                         String dest=admin.destinations.get(sc.nextInt()-1).city;
@@ -311,6 +345,16 @@ class Admin{
 
                                 admin.totalTrips++;
 
+                                admin.bookings.add(
+                                        new Booking(
+                                                name,
+                                                source,
+                                                dest,
+                                                route.distance,
+                                                total
+                                        )
+                                );
+
                                 new BookingThread(name,dest).start();
                                 new NotificationThread().start();
                             }
@@ -318,6 +362,7 @@ class Admin{
                         }else{
 
                             System.out.println("\nTrip not possible");
+                            System.out.println("\nAvailable Trips in Budget\n");
 
                             boolean found=false;
 
@@ -331,17 +376,25 @@ class Admin{
                                         des.hotelPerDay*days +
                                         des.foodPerDay*days;
 
-                                if(budget>=tot && admin.bookingCount.get(des.city)<4){
+                                if(budget>=tot &&
+                                        admin.bookingCount.get(des.city)<4){
+
                                     found=true;
-                                    System.out.println(source+" -> "+des.city);
-                                    System.out.println("Distance: "+r.distance+" km");
+
+                                    System.out.println(source+
+                                            " -> "+des.city);
+
+                                    System.out.println("Distance: "+
+                                            r.distance+" km");
+
                                     System.out.println("Total: "+tot);
                                     System.out.println();
                                 }
                             }
 
                             if(!found){
-                                System.out.println("No recommendations available");
+                                System.out.println(
+                                        "No recommendations available");
                             }
                         }
 
@@ -350,12 +403,11 @@ class Admin{
                     }
 
                     break;
-                }
 
-                case 3:{
+                case 3:
                     System.out.println("Exiting...");
+                    sc.close();
                     System.exit(0);
-                }
             }
         }
     }
