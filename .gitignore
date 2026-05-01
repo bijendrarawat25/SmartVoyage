@@ -1,6 +1,13 @@
-bin/
+# Compiled Java files
 *.class
-.vscode/
-*.log
-*.exe
-*.out
+
+# Libraries
+lib/
+*.jar
+
+# Data files
+*.dat
+
+# System files
+.DS_Store
+Thumbs.db
